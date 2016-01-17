@@ -1,0 +1,28 @@
+From 06cea7f8aa321c0322b44a478c3952bf8cc05ed9 Mon Sep 17 00:00:00 2001
+From: Leonid Segal <leonid.s@variscite.com>
+Date: Wed, 13 Jan 2016 15:00:18 +0200
+Subject: [PATCH] BUILD_FINGERPRINT length was decreased
+
+Change-Id: I6a3eccb74179a02ef2d302e621377752e2aa1e38
+---
+ core/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/core/Makefile b/core/Makefile
+index fae0457..823128c 100644
+--- a/core/Makefile
++++ b/core/Makefile
+@@ -118,7 +118,9 @@ ifeq (,$(strip $(BUILD_FINGERPRINT)))
+   else
+     BF_BUILD_NUMBER := $(BUILD_NUMBER)
+   endif
+-  BUILD_FINGERPRINT := $(PRODUCT_BRAND)/$(TARGET_PRODUCT)/$(TARGET_DEVICE):$(PLATFORM_VERSION)/$(BUILD_ID)/$(BF_BUILD_NUMBER):$(TARGET_BUILD_VARIANT)/$(BUILD_VERSION_TAGS)
++  #Too long fingerprint for ro.build.fingerprint property. Removing two first fields to go under 91 characters
++  #BUILD_FINGERPRINT := $(PRODUCT_BRAND)/$(TARGET_PRODUCT)/$(TARGET_DEVICE):$(PLATFORM_VERSION)/$(BUILD_ID)/$(BF_BUILD_NUMBER):$(TARGET_BUILD_VARIANT)/$(BUILD_VERSION_TAGS)
++  BUILD_FINGERPRINT := $(TARGET_DEVICE):$(PLATFORM_VERSION)/$(BUILD_ID)/$(BF_BUILD_NUMBER):$(TARGET_BUILD_VARIANT)/$(BUILD_VERSION_TAGS)
+ endif
+ ifneq ($(words $(BUILD_FINGERPRINT)),1)
+   $(error BUILD_FINGERPRINT cannot contain spaces: "$(BUILD_FINGERPRINT)")
+-- 
+1.9.1
+
