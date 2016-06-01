@@ -1,0 +1,38 @@
+From 8ce09a9b3278323efccbf45081122d0d9c01df29 Mon Sep 17 00:00:00 2001
+From: Leonid Segal <leonid.s@variscite.com>
+Date: Wed, 1 Jun 2016 19:18:24 +0300
+Subject: [PATCH 2/2] VAR-SD410CustomBoard Rev 1.01 support
+
+Change-Id: Ie8043e02369baf718ab1f2a4509281230b8a2211
+---
+ init.target.rc | 6 ++++++
+ 1 file changed, 6 insertions(+)
+ mode change 100644 => 100755 init.target.rc
+
+diff --git a/init.target.rc b/init.target.rc
+old mode 100644
+new mode 100755
+index 8ebf8de..801c547
+--- a/init.target.rc
++++ b/init.target.rc
+@@ -151,6 +151,8 @@ on boot
+     chown system drmrpc /sys/devices/soc.0/78b9000.i2c/i2c-5/5-0020/secure_touch
+     chown system drmrpc /sys/devices/soc.0/78b9000.i2c/i2c-5/5-0070/secure_touch_enable
+     chown system drmrpc /sys/devices/soc.0/78b9000.i2c/i2c-5/5-0070/secure_touch
++    write /sys/class/leds/lcd-backlight/brightness 50
++
+ 
+ service wcnss-service /system/bin/wcnss_service
+     class main
+@@ -241,3 +243,7 @@ on property:sys.boot_completed=1
+     start imsdatadaemon
+     start ims_rtp_daemon
+     start wcnss-service
++	write /sys/class/gpio/export 998
++	write /sys/class/gpio/gpio998/direction out
++	write /sys/class/gpio/gpio998/value 1
++	
+\ No newline at end of file
+-- 
+1.9.1
+
