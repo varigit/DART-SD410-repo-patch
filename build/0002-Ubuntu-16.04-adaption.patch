@@ -1,0 +1,25 @@
+From 765a380e04f9484e83d1c4bba75630932e83fb9b Mon Sep 17 00:00:00 2001
+From: Leonid Segal <leonid.s@variscite.com>
+Date: Sat, 17 Dec 2016 20:43:18 +0200
+Subject: [PATCH 2/2] Ubuntu 16.04 adaption
+
+Change-Id: I85dfbf0f40722f6be5f8667f810cfae197827719
+---
+ core/clang/HOST_x86_common.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/core/clang/HOST_x86_common.mk b/core/clang/HOST_x86_common.mk
+index 0241cb6..77547b7 100644
+--- a/core/clang/HOST_x86_common.mk
++++ b/core/clang/HOST_x86_common.mk
+@@ -8,6 +8,7 @@ ifeq ($(HOST_OS),linux)
+ CLANG_CONFIG_x86_LINUX_HOST_EXTRA_ASFLAGS := \
+   --gcc-toolchain=$($(clang_2nd_arch_prefix)HOST_TOOLCHAIN_FOR_CLANG) \
+   --sysroot=$($(clang_2nd_arch_prefix)HOST_TOOLCHAIN_FOR_CLANG)/sysroot \
++  -B$($(clang_2nd_arch_prefix)HOST_TOOLCHAIN_FOR_CLANG)/x86_64-linux/bin \
+   -no-integrated-as
+ 
+ CLANG_CONFIG_x86_LINUX_HOST_EXTRA_CFLAGS := \
+-- 
+2.7.4
+
