@@ -1,3 +1,4 @@
-Android repositories patch
+Yocto repositories patch
 
-This three contains specific patches for the Android three that will enable Variscite's platform DART-SD410 to run Android.
+
+This tree contains specific patches for the Yocto tree that will enable Variscite's platform DART-SD410.

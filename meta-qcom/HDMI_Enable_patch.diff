@@ -1,0 +1,12 @@
+diff --git a/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb b/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
+index b7e6ce1..fbe0e9d 100644
+--- a/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
++++ b/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
+@@ -14,6 +14,7 @@ SRCBRANCH ?= "release/qcomlt-4.9"
+ SRCREV ?= "529c1db225629896d51b64a481b3760fd81a663a"
+ 
+ SRC_URI_dart-sd410 = "git://github.com/varigit/DART-SD410-kernel.git;protocol=https;branch=release/kernel-17.06"
++SRC_URI_dart-sd410 += "file://HDMI_enable.patch"
+ SRCREV_dart-sd410 = "d71b224577d0d0c20a937c18f781446b21f21d7e"
+ 
+ COMPATIBLE_MACHINE = "(ifc6410|sd-600eval|dragonboard-410c|dart-sd410)"

@@ -1,0 +1,1141 @@
+From 3dd9fc5ae5882933e073920c8716e782b0bae90b Mon Sep 17 00:00:00 2001
+From: Leonid Segal <leonid.s@variscite.com>
+Date: Wed, 2 Aug 2017 18:12:46 +0300
+Subject: [PATCH] dart-sd410: Variscite DART-SD410 platform support added
+
+---
+ conf/eula/dart-sd410                               | 209 +++++++++++++++++++++
+ conf/eula/dart-sd410-32                            | 209 +++++++++++++++++++++
+ conf/machine/dart-sd410-32.conf                    |  21 +++
+ conf/machine/dart-sd410.conf                       |  23 +++
+ .../gpsd/gpsd-machine-conf_%.bbappend              |   1 +
+ .../firmware-qcom-dragonboard410c_1032.1.bb        |   4 +-
+ ...use-support-compressed-ARM64-kernel-image.patch | 104 ++++++++++
+ .../files/0002-skales-Add-msm8998-support.patch    |  67 +++++++
+ ...-add-clk_ignore_unused-to-kernel-commandl.patch |  29 +++
+ .../files/0004-package-Evaluate-arch-later.patch   |  50 +++++
+ .../0005-mkbootimg-Always-pad-out-the-image.patch  |  26 +++
+ ...ge-Don-t-overwrite-image-from-board-files.patch |  39 ++++
+ .../files/0007-boards-8916-Fix-boot-address.patch  |  30 +++
+ .../files/0008-mkbootimg-Add-boards-option.patch   |  47 +++++
+ .../0009-README-only-libfdt1-is-required.patch     |  29 +++
+ ...riscite-DART-SD410-platform-support-added.patch |  24 +++
+ recipes-devtools/skales/skales_git.bb              |  13 ++
+ recipes-kernel/linux/files/HDMI_enable.patch       |  13 ++
+ recipes-kernel/linux/linux-linaro-qcom.inc         |   1 +
+ recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb    |   5 +-
+ 20 files changed, 941 insertions(+), 3 deletions(-)
+ create mode 100644 conf/eula/dart-sd410
+ create mode 100644 conf/eula/dart-sd410-32
+ create mode 100644 conf/machine/dart-sd410-32.conf
+ create mode 100644 conf/machine/dart-sd410.conf
+ create mode 100644 recipes-devtools/skales/files/0001-skales-use-support-compressed-ARM64-kernel-image.patch
+ create mode 100644 recipes-devtools/skales/files/0002-skales-Add-msm8998-support.patch
+ create mode 100644 recipes-devtools/skales/files/0003-boards-8998-add-clk_ignore_unused-to-kernel-commandl.patch
+ create mode 100644 recipes-devtools/skales/files/0004-package-Evaluate-arch-later.patch
+ create mode 100644 recipes-devtools/skales/files/0005-mkbootimg-Always-pad-out-the-image.patch
+ create mode 100644 recipes-devtools/skales/files/0006-package-Don-t-overwrite-image-from-board-files.patch
+ create mode 100644 recipes-devtools/skales/files/0007-boards-8916-Fix-boot-address.patch
+ create mode 100644 recipes-devtools/skales/files/0008-mkbootimg-Add-boards-option.patch
+ create mode 100644 recipes-devtools/skales/files/0009-README-only-libfdt1-is-required.patch
+ create mode 100644 recipes-devtools/skales/files/0010-Variscite-DART-SD410-platform-support-added.patch
+ create mode 100644 recipes-kernel/linux/files/HDMI_enable.patch
+
+diff --git a/conf/eula/dart-sd410 b/conf/eula/dart-sd410
+new file mode 100644
+index 0000000..eb46094
+--- /dev/null
++++ b/conf/eula/dart-sd410
+@@ -0,0 +1,209 @@
++PLEASE READ THIS LICENSE AGREEMENT (“AGREEMENT”) CAREFULLY.  THIS AGREEMENT IS A
++BINDING LEGAL AGREEMENT ENTERED INTO BY AND BETWEEN YOU (OR IF YOU ARE ENTERING
++INTO THIS AGREEMENT ON BEHALF OF AN ENTITY, THEN THE ENTITY THAT YOU REPRESENT)
++AND QUALCOMM TECHNOLOGIES, INC. (“QTI” “WE” “OUR” OR “US”).  THIS IS THE
++AGREEMENT THAT APPLIES TO YOUR USE OF THE DESIGNATED AND/OR LINKED APPLICATIONS,
++THE ENCLOSED QUALCOMM TECHNOLOGIES’ MATERIALS, INCLUDING RELATED DOCUMENTATION
++AND ANY UPDATES OR IMPROVEMENTS THEREOF (COLLECTIVELY, “MATERIALS”).  BY USING
++OR COMPLETING THE INSTALLATION OF THE MATERIALS, YOU ARE ACCEPTING THIS
++AGREEMENT AND YOU AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.  IF YOU DO NOT
++AGREE TO THESE TERMS, QTI IS UNWILLING TO AND DOES NOT LICENSE THE MATERIALS TO
++YOU. IF YOU DO NOT AGREE TO THESE TERMS YOU MUST DISCONTINUE THE INSTALLATION
++PROCESS AND YOU MAY NOT USE THE MATERIALS OR RETAIN ANY COPIES OF THE
++MATERIALS. ANY USE OR POSSESSION OF THE MATERIALS BY YOU IS SUBJECT TO THE TERMS
++AND CONDITIONS SET FORTH IN THIS AGREEMENT.
++
++1. RIGHT TO USE DELIVERABLES; RESTRICTIONS.
++
++	1.1 License.  Subject to the terms and conditions of this Agreement,
++	including, without limitation, the restrictions, conditions, limitations and
++	exclusions set forth in this Agreement, QTI hereby grants to you a
++	nonexclusive, limited license under QTI’s copyrights to: (i) install and use
++	the Materials; and (ii) to reproduce and redistribute the binary code
++	portions of the Materials (the “Redistributable Binary Code”).  You may make
++	and use a reasonable number of copies of any documentation.
++
++	1.2 Redistribution Restrictions.  Distribution of the Redistributable Binary
++	Code is subject to the following restrictions: (i) Redistributable Binary
++	Code may only be distributed in binary format and may not be distributed in
++	source code format:; (ii) the Redistributable Binary Code may only operate
++	in conjunction with platforms incorporating Qualcomm Technologies,
++	Inc. chipsets; (iii) redistribution of the Redistributable Binary Code must
++	include the .txt file setting forth the terms and condition of this
++	Agreement; (iv) you may not use Qualcomm Technologies’ or its affiliates or
++	subsidiaries name, logo or trademarks; and (v) copyright, trademark, patent
++	and any other notices that appear on the Materials may not be removed or
++	obscured.
++
++	1.3 Additional Restrictions.  Except as expressly permitted by this
++	Agreement, you shall have no right to sublicense, transfer or otherwise
++	disclose the Materials to any third party.  You shall not reverse engineer,
++	reverse assemble, reverse translate, decompile or reduce to source code form
++	any portion of the Materials provided in object code form or executable
++	form.  Except for the purposes expressly permitted in this Agreement, You
++	shall not use the Materials for any other purpose.  QTI (or its licensors)
++	shall retain title and all ownership rights in and to the Materials and any
++	alterations, modifications (including all derivative works), translations or
++	adaptations made of the Materials, and all copies thereof, and nothing
++	herein shall be deemed to grant any right to You under any of QTI's or its
++	affiliates’ patents.  You shall not subject the Materials to any third party
++	license terms (e.g., open source license terms).  You shall not use the
++	Materials for the purpose of identifying or providing evidence to support
++	any potential patent infringement claim against QTI, its affiliates, or any
++	of QTI’s or QTI’s affiliates’ suppliers and/or direct or indirect customers.
++	QTI hereby reserves all rights not expressly granted herein.
++
++	1.4 Third Party Software and Materials.  The Software may contain or link to
++	certain software and/or materials that are written or owned by third
++	parties.  Such third party code and materials may be licensed under separate
++	or different terms and conditions and are not licensed to you under the
++	terms of this Agreement.  You agree to comply with all terms and conditions
++	imposed on you in the applicable third party licenses.  Such terms and
++	conditions may impose certain obligations on you as a condition to the
++	permitted use of such third party code and materials.  QTI does not
++	represent or warrant that such third party licensors have or will continue
++	to license or make available their code and materials to you.
++
++	1.5 Feedback.  QTI may from time to time receive suggestions, feedback or
++	other information from You regarding the Materials.  Any suggestions,
++	feedback or other disclosures received from You are and shall be entirely
++	voluntary on the part of You.  Notwithstanding any other term in this
++	Agreement, QTI shall be free to use suggestions, feedback or other
++	information received from You, without obligation of any kind to You.  The
++	Parties agree that all inventions, product improvements, and modifications
++	conceived of or made by QTI that are based, either in whole or in part, on
++	ideas, feedback, suggestions, or recommended improvements received from You
++	are the exclusive property of QTI, and all right, title and interest in and
++	to any such inventions, product improvements, and modifications will vest
++	solely in QTI.
++
++	1.6 No Technical Support.  QTI is under no obligation to provide any form of
++	technical support for the Materials, and if QTI, in its sole discretion,
++	chooses to provide any form of support or information relating to the
++	Materials, such support and information shall be deemed confidential and
++	proprietary to QTI.
++
++2. WARRANTY DISCLAIMER.  YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT THE USE OF THE
++MATERIALS IS AT YOUR SOLE RISK.  THE MATERIALS AND TECHNICAL SUPPORT, IF ANY,
++ARE PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR
++IMPLIED.  QTI ITS LICENSORS AND AFFILIATES MAKE NO WARRANTIES, EXPRESS OR
++IMPLIED, WITH RESPECT TO THE MATERIALS OR ANY OTHER INFORMATION OR DOCUMENTATION
++PROVIDED UNDER THIS AGREEMENT, INCLUDING BUT NOT LIMITED TO ANY WARRANTY OF
++MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE OR AGAINST INFRINGEMENT, OR
++ANY EXPRESS OR IMPLIED WARRANTY ARISING OUT OF TRADE USAGE OR OUT OF A COURSE OF
++DEALING OR COURSE OF PERFORMANCE.  NOTHING CONTAINED IN THIS AGREEMENT SHALL BE
++CONSTRUED AS (I) A WARRANTY OR REPRESENTATION BY QTI, ITS LICENSORS OR
++AFFILIATES AS TO THE VALIDITY OR SCOPE OF ANY PATENT, COPYRIGHT OR OTHER
++INTELLECTUAL PROPERTY RIGHT OR (II) A WARRANTY OR REPRESENTATION BY QTI THAT ANY
++MANUFACTURE OR USE WILL BE FREE FROM INFRINGEMENT OF PATENTS, COPYRIGHTS OR
++OTHER INTELLECTUAL PROPERTY RIGHTS OF OTHERS, AND IT SHALL BE THE SOLE
++RESPONSIBILITY OF YOU TO MAKE SUCH DETERMINATION AS IS NECESSARY WITH RESPECT TO
++THE ACQUISITION OF LICENSES UNDER PATENTS AND OTHER INTELLECTUAL PROPERTY OF
++THIRD PARTIES.
++
++3. NO OTHER LICENSES OR INTELLECTUAL PROPERTY RIGHTS. Neither this Agreement,
++nor any act by QTI or any of its affiliates pursuant to this Agreement or
++relating to the Materials (including, without limitation, the provision by QTI
++or its affiliates of the Materials), shall provide to You any license or any
++other rights whatsoever under any patents, trademarks, trade secrets, copyrights
++or any other intellectual property of QTI or any of its affiliates, except for
++the copyright rights expressly licensed under this Agreement. You understand and
++agree that:
++
++		(i) Neither this Agreement, nor delivery of the Materials, grants any
++		right to practice, or any other right at all with respect to, any patent
++		of QTI or any of its affiliates; and
++
++		(ii) A separate license agreement from QUALCOMM Incorporated is needed
++		to use or practice any patent of QUALCOMM Incorporated. You agree not to
++		contend in any context that, as a result of the provision or use of the
++		Materials, either QTI or any of its affiliates has any obligation to
++		extend, or You or any other party has obtained any right to, any
++		license, whether express or implied, with respect to any patent of QTI
++		or any of its affiliates for any purpose.
++
++4. TERMINATION.  This Agreement shall be effective upon acceptance, or access or
++use of the Materials (whichever occurs first) by You and shall continue until
++terminated. You may terminate the Agreement at any time by deleting and
++destroying all copies of the Materials and all related information in Your
++possession or control. This Agreement terminates immediately and automatically,
++with or without notice, if You fail to comply with any provision
++hereof. Additionally, QTI may at any time terminate this Agreement, without
++cause, upon notice to You. Upon termination You must, to the extent possible,
++delete or destroy all copies of the Materials in Your possession and the license
++granted to You in this Agreement shall terminate. Sections 1.2 through 10 shall
++survive the termination of this Agreement. In the event that any restrictions,
++conditions, limitations are found to be either invalid or unenforceable, the
++rights granted to You in Section 1 (License) shall be null, void and ineffective
++from the Effective Date, and QTI shall also have the right to terminate this
++Agreement immediately, and with retroactive effect to the effective date.
++
++5. LIMITATION OF LIABILITY.  IN NO EVENT SHALL QTI, QTI’s AFFILIATES OR ITS
++LICENSORS BE LIABLE TO YOU FOR ANY INCIDENTAL, CONSEQUENTIAL OR SPECIAL DAMAGES,
++INCLUDING BUT NOT LIMITED TO ANY LOST PROFITS, LOST SAVINGS, OR OTHER INCIDENTAL
++DAMAGES, ARISING OUT OF THE USE OR INABILITY TO USE, OR THE DELIVERY OR FAILURE
++TO DELIVER, ANY OF THE DELIVERABLES, OR ANY BREACH OF ANY OBLIGATION UNDER THIS
++AGREEMENT, EVEN IF QTI HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.  THE
++FOREGOING LIMITATION OF LIABILITY SHALL REMAIN IN FULL FORCE AND EFFECT
++REGARDLESS OF WHETHER YOUR REMEDIES HEREUNDER ARE DETERMINED TO HAVE FAILED OF
++THEIR ESSENTIAL PURPOSE.  THE ENTIRE LIABILITY OF QTI, QTI’s AFFILIATES AND ITS
++LICENSORS, AND THE SOLE AND EXCLUSIVE REMEDY OF YOU, FOR ANY CLAIM OR CAUSE OF
++ACTION ARISING HEREUNDER (WHETHER IN CONTRACT, TORT, OR OTHERWISE) SHALL NOT
++EXCEED US$50.
++
++6. INDEMNIFICATION.  You agree to indemnify and hold harmless QTI and its
++officers, directors, employees and successors and assigns against any and all
++third party claims, demands, causes of action, losses, liabilities, damages,
++costs and expenses, incurred by QTI (including but not limited to costs of
++defense, investigation and reasonable attorney’s fees) arising out of, resulting
++from or related to: (i) any breach of this Agreement by You; and (ii) your acts,
++omissions, products and services.  If requested by QTI, You agree to defend QTI
++in connection with any third party claims, demands, or causes of action
++resulting from, arising out of or in connection with any of the foregoing.
++
++7. ASSIGNMENT.  You shall not assign this Agreement or any right or interest
++under this Agreement, nor delegate any obligation to be performed under this
++Agreement, without QTI’s prior written consent.  For purposes of this Section 7,
++an “assignment” by You under this Section shall be deemed to include, without
++limitation, any merger, consolidation, sale of all or substantially all of its
++assets, or any substantial change in the management or control of You.  Any
++attempted assignment in contravention of this Section 9 shall be void.  QTI may
++freely assign this Agreement or delegate any or all of its rights and
++obligations hereunder to any third party.
++
++8. COMPLIANCE WITH LAWS; APPLICABLE LAW.  You agree to comply with all
++applicable local, international and national laws and regulations and with
++U.S. Export Administration Regulations, as they apply to the subject matter of
++this Agreement.  This Agreement is governed by the laws of the State of
++California, excluding California’s choice of law rules.
++
++9. CONTRACTING PARTIES.  If the Materials are downloaded on any computer owned
++by a corporation or other legal entity, then this Agreement is formed by and
++between QTI and such entity.  The individual accepting the terms of this
++Agreement represents and warrants to QTI that they have the authority to bind
++such entity to the terms and conditions of this Agreement.
++
++10. MISCELLANEOUS PROVISIONS.  This Agreement, together with all exhibits
++attached hereto, which are incorporated herein by this reference, constitutes
++the entire agreement between QTI and You and supersedes all prior negotiations,
++representations and agreements between the parties with respect to the subject
++matter hereof.  No addition or modification of this Agreement shall be effective
++unless made in writing and signed by the respective representatives of QTI and
++You.  The restrictions, limitations, exclusions and conditions set forth in this
++Agreement shall apply even if QTI or any of its affiliates becomes aware of or
++fails to act in a manner to address any violation or failure to comply
++therewith.  You hereby acknowledge and agree that the restrictions, limitations,
++conditions and exclusions imposed in this Agreement on the rights granted in
++this Agreement are not a derogation of the benefits of such rights.  You further
++acknowledges that, in the absence of such restrictions, limitations, conditions
++and exclusions, QTI would not have entered into this Agreement with You.  Each
++party shall be responsible for and shall bear its own expenses in connection
++with this Agreement.  If any of the provisions of this Agreement are determined
++to be invalid, illegal, or otherwise unenforceable, the remaining provisions
++shall remain in full force and effect.  This Agreement is entered into solely in
++the English language, and if for any reason any other language version is
++prepared by any party, it shall be solely for convenience and the English
++version shall govern and control all aspects.  If You are located in the
++province of Quebec, Canada, the following applies: The Parties hereby confirm
++they have requested this Agreement and all related documents be prepared in
++English.
+diff --git a/conf/eula/dart-sd410-32 b/conf/eula/dart-sd410-32
+new file mode 100644
+index 0000000..eb46094
+--- /dev/null
++++ b/conf/eula/dart-sd410-32
+@@ -0,0 +1,209 @@
++PLEASE READ THIS LICENSE AGREEMENT (“AGREEMENT”) CAREFULLY.  THIS AGREEMENT IS A
++BINDING LEGAL AGREEMENT ENTERED INTO BY AND BETWEEN YOU (OR IF YOU ARE ENTERING
++INTO THIS AGREEMENT ON BEHALF OF AN ENTITY, THEN THE ENTITY THAT YOU REPRESENT)
++AND QUALCOMM TECHNOLOGIES, INC. (“QTI” “WE” “OUR” OR “US”).  THIS IS THE
++AGREEMENT THAT APPLIES TO YOUR USE OF THE DESIGNATED AND/OR LINKED APPLICATIONS,
++THE ENCLOSED QUALCOMM TECHNOLOGIES’ MATERIALS, INCLUDING RELATED DOCUMENTATION
++AND ANY UPDATES OR IMPROVEMENTS THEREOF (COLLECTIVELY, “MATERIALS”).  BY USING
++OR COMPLETING THE INSTALLATION OF THE MATERIALS, YOU ARE ACCEPTING THIS
++AGREEMENT AND YOU AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.  IF YOU DO NOT
++AGREE TO THESE TERMS, QTI IS UNWILLING TO AND DOES NOT LICENSE THE MATERIALS TO
++YOU. IF YOU DO NOT AGREE TO THESE TERMS YOU MUST DISCONTINUE THE INSTALLATION
++PROCESS AND YOU MAY NOT USE THE MATERIALS OR RETAIN ANY COPIES OF THE
++MATERIALS. ANY USE OR POSSESSION OF THE MATERIALS BY YOU IS SUBJECT TO THE TERMS
++AND CONDITIONS SET FORTH IN THIS AGREEMENT.
++
++1. RIGHT TO USE DELIVERABLES; RESTRICTIONS.
++
++	1.1 License.  Subject to the terms and conditions of this Agreement,
++	including, without limitation, the restrictions, conditions, limitations and
++	exclusions set forth in this Agreement, QTI hereby grants to you a
++	nonexclusive, limited license under QTI’s copyrights to: (i) install and use
++	the Materials; and (ii) to reproduce and redistribute the binary code
++	portions of the Materials (the “Redistributable Binary Code”).  You may make
++	and use a reasonable number of copies of any documentation.
++
++	1.2 Redistribution Restrictions.  Distribution of the Redistributable Binary
++	Code is subject to the following restrictions: (i) Redistributable Binary
++	Code may only be distributed in binary format and may not be distributed in
++	source code format:; (ii) the Redistributable Binary Code may only operate
++	in conjunction with platforms incorporating Qualcomm Technologies,
++	Inc. chipsets; (iii) redistribution of the Redistributable Binary Code must
++	include the .txt file setting forth the terms and condition of this
++	Agreement; (iv) you may not use Qualcomm Technologies’ or its affiliates or
++	subsidiaries name, logo or trademarks; and (v) copyright, trademark, patent
++	and any other notices that appear on the Materials may not be removed or
++	obscured.
++
++	1.3 Additional Restrictions.  Except as expressly permitted by this
++	Agreement, you shall have no right to sublicense, transfer or otherwise
++	disclose the Materials to any third party.  You shall not reverse engineer,
++	reverse assemble, reverse translate, decompile or reduce to source code form
++	any portion of the Materials provided in object code form or executable
++	form.  Except for the purposes expressly permitted in this Agreement, You
++	shall not use the Materials for any other purpose.  QTI (or its licensors)
++	shall retain title and all ownership rights in and to the Materials and any
++	alterations, modifications (including all derivative works), translations or
++	adaptations made of the Materials, and all copies thereof, and nothing
++	herein shall be deemed to grant any right to You under any of QTI's or its
++	affiliates’ patents.  You shall not subject the Materials to any third party
++	license terms (e.g., open source license terms).  You shall not use the
++	Materials for the purpose of identifying or providing evidence to support
++	any potential patent infringement claim against QTI, its affiliates, or any
++	of QTI’s or QTI’s affiliates’ suppliers and/or direct or indirect customers.
++	QTI hereby reserves all rights not expressly granted herein.
++
++	1.4 Third Party Software and Materials.  The Software may contain or link to
++	certain software and/or materials that are written or owned by third
++	parties.  Such third party code and materials may be licensed under separate
++	or different terms and conditions and are not licensed to you under the
++	terms of this Agreement.  You agree to comply with all terms and conditions
++	imposed on you in the applicable third party licenses.  Such terms and
++	conditions may impose certain obligations on you as a condition to the
++	permitted use of such third party code and materials.  QTI does not
++	represent or warrant that such third party licensors have or will continue
++	to license or make available their code and materials to you.
++
++	1.5 Feedback.  QTI may from time to time receive suggestions, feedback or
++	other information from You regarding the Materials.  Any suggestions,
++	feedback or other disclosures received from You are and shall be entirely
++	voluntary on the part of You.  Notwithstanding any other term in this
++	Agreement, QTI shall be free to use suggestions, feedback or other
++	information received from You, without obligation of any kind to You.  The
++	Parties agree that all inventions, product improvements, and modifications
++	conceived of or made by QTI that are based, either in whole or in part, on
++	ideas, feedback, suggestions, or recommended improvements received from You
++	are the exclusive property of QTI, and all right, title and interest in and
++	to any such inventions, product improvements, and modifications will vest
++	solely in QTI.
++
++	1.6 No Technical Support.  QTI is under no obligation to provide any form of
++	technical support for the Materials, and if QTI, in its sole discretion,
++	chooses to provide any form of support or information relating to the
++	Materials, such support and information shall be deemed confidential and
++	proprietary to QTI.
++
++2. WARRANTY DISCLAIMER.  YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT THE USE OF THE
++MATERIALS IS AT YOUR SOLE RISK.  THE MATERIALS AND TECHNICAL SUPPORT, IF ANY,
++ARE PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS OR
++IMPLIED.  QTI ITS LICENSORS AND AFFILIATES MAKE NO WARRANTIES, EXPRESS OR
++IMPLIED, WITH RESPECT TO THE MATERIALS OR ANY OTHER INFORMATION OR DOCUMENTATION
++PROVIDED UNDER THIS AGREEMENT, INCLUDING BUT NOT LIMITED TO ANY WARRANTY OF
++MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE OR AGAINST INFRINGEMENT, OR
++ANY EXPRESS OR IMPLIED WARRANTY ARISING OUT OF TRADE USAGE OR OUT OF A COURSE OF
++DEALING OR COURSE OF PERFORMANCE.  NOTHING CONTAINED IN THIS AGREEMENT SHALL BE
++CONSTRUED AS (I) A WARRANTY OR REPRESENTATION BY QTI, ITS LICENSORS OR
++AFFILIATES AS TO THE VALIDITY OR SCOPE OF ANY PATENT, COPYRIGHT OR OTHER
++INTELLECTUAL PROPERTY RIGHT OR (II) A WARRANTY OR REPRESENTATION BY QTI THAT ANY
++MANUFACTURE OR USE WILL BE FREE FROM INFRINGEMENT OF PATENTS, COPYRIGHTS OR
++OTHER INTELLECTUAL PROPERTY RIGHTS OF OTHERS, AND IT SHALL BE THE SOLE
++RESPONSIBILITY OF YOU TO MAKE SUCH DETERMINATION AS IS NECESSARY WITH RESPECT TO
++THE ACQUISITION OF LICENSES UNDER PATENTS AND OTHER INTELLECTUAL PROPERTY OF
++THIRD PARTIES.
++
++3. NO OTHER LICENSES OR INTELLECTUAL PROPERTY RIGHTS. Neither this Agreement,
++nor any act by QTI or any of its affiliates pursuant to this Agreement or
++relating to the Materials (including, without limitation, the provision by QTI
++or its affiliates of the Materials), shall provide to You any license or any
++other rights whatsoever under any patents, trademarks, trade secrets, copyrights
++or any other intellectual property of QTI or any of its affiliates, except for
++the copyright rights expressly licensed under this Agreement. You understand and
++agree that:
++
++		(i) Neither this Agreement, nor delivery of the Materials, grants any
++		right to practice, or any other right at all with respect to, any patent
++		of QTI or any of its affiliates; and
++
++		(ii) A separate license agreement from QUALCOMM Incorporated is needed
++		to use or practice any patent of QUALCOMM Incorporated. You agree not to
++		contend in any context that, as a result of the provision or use of the
++		Materials, either QTI or any of its affiliates has any obligation to
++		extend, or You or any other party has obtained any right to, any
++		license, whether express or implied, with respect to any patent of QTI
++		or any of its affiliates for any purpose.
++
++4. TERMINATION.  This Agreement shall be effective upon acceptance, or access or
++use of the Materials (whichever occurs first) by You and shall continue until
++terminated. You may terminate the Agreement at any time by deleting and
++destroying all copies of the Materials and all related information in Your
++possession or control. This Agreement terminates immediately and automatically,
++with or without notice, if You fail to comply with any provision
++hereof. Additionally, QTI may at any time terminate this Agreement, without
++cause, upon notice to You. Upon termination You must, to the extent possible,
++delete or destroy all copies of the Materials in Your possession and the license
++granted to You in this Agreement shall terminate. Sections 1.2 through 10 shall
++survive the termination of this Agreement. In the event that any restrictions,
++conditions, limitations are found to be either invalid or unenforceable, the
++rights granted to You in Section 1 (License) shall be null, void and ineffective
++from the Effective Date, and QTI shall also have the right to terminate this
++Agreement immediately, and with retroactive effect to the effective date.
++
++5. LIMITATION OF LIABILITY.  IN NO EVENT SHALL QTI, QTI’s AFFILIATES OR ITS
++LICENSORS BE LIABLE TO YOU FOR ANY INCIDENTAL, CONSEQUENTIAL OR SPECIAL DAMAGES,
++INCLUDING BUT NOT LIMITED TO ANY LOST PROFITS, LOST SAVINGS, OR OTHER INCIDENTAL
++DAMAGES, ARISING OUT OF THE USE OR INABILITY TO USE, OR THE DELIVERY OR FAILURE
++TO DELIVER, ANY OF THE DELIVERABLES, OR ANY BREACH OF ANY OBLIGATION UNDER THIS
++AGREEMENT, EVEN IF QTI HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.  THE
++FOREGOING LIMITATION OF LIABILITY SHALL REMAIN IN FULL FORCE AND EFFECT
++REGARDLESS OF WHETHER YOUR REMEDIES HEREUNDER ARE DETERMINED TO HAVE FAILED OF
++THEIR ESSENTIAL PURPOSE.  THE ENTIRE LIABILITY OF QTI, QTI’s AFFILIATES AND ITS
++LICENSORS, AND THE SOLE AND EXCLUSIVE REMEDY OF YOU, FOR ANY CLAIM OR CAUSE OF
++ACTION ARISING HEREUNDER (WHETHER IN CONTRACT, TORT, OR OTHERWISE) SHALL NOT
++EXCEED US$50.
++
++6. INDEMNIFICATION.  You agree to indemnify and hold harmless QTI and its
++officers, directors, employees and successors and assigns against any and all
++third party claims, demands, causes of action, losses, liabilities, damages,
++costs and expenses, incurred by QTI (including but not limited to costs of
++defense, investigation and reasonable attorney’s fees) arising out of, resulting
++from or related to: (i) any breach of this Agreement by You; and (ii) your acts,
++omissions, products and services.  If requested by QTI, You agree to defend QTI
++in connection with any third party claims, demands, or causes of action
++resulting from, arising out of or in connection with any of the foregoing.
++
++7. ASSIGNMENT.  You shall not assign this Agreement or any right or interest
++under this Agreement, nor delegate any obligation to be performed under this
++Agreement, without QTI’s prior written consent.  For purposes of this Section 7,
++an “assignment” by You under this Section shall be deemed to include, without
++limitation, any merger, consolidation, sale of all or substantially all of its
++assets, or any substantial change in the management or control of You.  Any
++attempted assignment in contravention of this Section 9 shall be void.  QTI may
++freely assign this Agreement or delegate any or all of its rights and
++obligations hereunder to any third party.
++
++8. COMPLIANCE WITH LAWS; APPLICABLE LAW.  You agree to comply with all
++applicable local, international and national laws and regulations and with
++U.S. Export Administration Regulations, as they apply to the subject matter of
++this Agreement.  This Agreement is governed by the laws of the State of
++California, excluding California’s choice of law rules.
++
++9. CONTRACTING PARTIES.  If the Materials are downloaded on any computer owned
++by a corporation or other legal entity, then this Agreement is formed by and
++between QTI and such entity.  The individual accepting the terms of this
++Agreement represents and warrants to QTI that they have the authority to bind
++such entity to the terms and conditions of this Agreement.
++
++10. MISCELLANEOUS PROVISIONS.  This Agreement, together with all exhibits
++attached hereto, which are incorporated herein by this reference, constitutes
++the entire agreement between QTI and You and supersedes all prior negotiations,
++representations and agreements between the parties with respect to the subject
++matter hereof.  No addition or modification of this Agreement shall be effective
++unless made in writing and signed by the respective representatives of QTI and
++You.  The restrictions, limitations, exclusions and conditions set forth in this
++Agreement shall apply even if QTI or any of its affiliates becomes aware of or
++fails to act in a manner to address any violation or failure to comply
++therewith.  You hereby acknowledge and agree that the restrictions, limitations,
++conditions and exclusions imposed in this Agreement on the rights granted in
++this Agreement are not a derogation of the benefits of such rights.  You further
++acknowledges that, in the absence of such restrictions, limitations, conditions
++and exclusions, QTI would not have entered into this Agreement with You.  Each
++party shall be responsible for and shall bear its own expenses in connection
++with this Agreement.  If any of the provisions of this Agreement are determined
++to be invalid, illegal, or otherwise unenforceable, the remaining provisions
++shall remain in full force and effect.  This Agreement is entered into solely in
++the English language, and if for any reason any other language version is
++prepared by any party, it shall be solely for convenience and the English
++version shall govern and control all aspects.  If You are located in the
++province of Quebec, Canada, the following applies: The Parties hereby confirm
++they have requested this Agreement and all related documents be prepared in
++English.
+diff --git a/conf/machine/dart-sd410-32.conf b/conf/machine/dart-sd410-32.conf
+new file mode 100644
+index 0000000..91ed7cf
+--- /dev/null
++++ b/conf/machine/dart-sd410-32.conf
+@@ -0,0 +1,21 @@
++#@TYPE: Machine
++#@NAME: dart-sd410-32
++#@DESCRIPTION: 32-bit machine configuration for the DART-SD410 (Variscite), with Qualcomm Snapdragon 410 APQ8016.
++
++require conf/machine/include/qcom-apq8016.inc
++require conf/machine/include/tune-cortexa8.inc
++
++MACHINE_FEATURES = "usbhost usbgadget alsa screen wifi bluetooth ext2"
++
++SERIAL_CONSOLE = "115200 ttyMSM0"
++
++# Building 32-bit kernel is not supported.
++PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
++RDEPENDS_kernel-base = ""
++
++MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'mesa-driver-msm', '', d)} \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wcnss-config wcnss-start', '', d)} \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'bluez5', 'bluez5-noinst-tools', '', d)} \
++    ${@'firmware-qcom-dragonboard410c' if d.getVar('ACCEPT_EULA_dart-sd410-32', True) == '1' else ''} \
++"
+diff --git a/conf/machine/dart-sd410.conf b/conf/machine/dart-sd410.conf
+new file mode 100644
+index 0000000..5eaeade
+--- /dev/null
++++ b/conf/machine/dart-sd410.conf
+@@ -0,0 +1,23 @@
++#@TYPE: Machine
++#@NAME: dart-sd410
++#@DESCRIPTION: Machine configuration for the DART-SD410 (Variscite), with Qualcomm Snapdragon 410 APQ8016.
++
++require conf/machine/include/qcom-apq8016.inc
++require conf/machine/include/arm/arch-armv8.inc
++
++MACHINE_FEATURES = "usbhost usbgadget alsa screen wifi bluetooth ext2"
++
++KERNEL_IMAGETYPE = "Image"
++KERNEL_DEVICETREE = "qcom/apq8016-var-dart.dtb"
++
++SERIAL_CONSOLE = "115200 ttyMSM0"
++
++MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " \
++    kernel-modules \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'mesa-driver-msm', '', d)} \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wcnss-config wcnss-start', '', d)} \
++    ${@bb.utils.contains('DISTRO_FEATURES', 'bluez5', 'bluez5-noinst-tools', '', d)} \
++    ${@'firmware-qcom-dragonboard410c' if d.getVar('ACCEPT_EULA_dart-sd410', True) == '1' else ''} \
++"
++
++QCOM_BOOTIMG_ROOTFS ?= "mmcblk0p10"
+diff --git a/openembedded-layer/recipes-navigation/gpsd/gpsd-machine-conf_%.bbappend b/openembedded-layer/recipes-navigation/gpsd/gpsd-machine-conf_%.bbappend
+index 179c438..76b3119 100644
+--- a/openembedded-layer/recipes-navigation/gpsd/gpsd-machine-conf_%.bbappend
++++ b/openembedded-layer/recipes-navigation/gpsd/gpsd-machine-conf_%.bbappend
+@@ -1,5 +1,6 @@
+ EXTRA_DEPS = ""
+ EXTRA_DEPS_dragonboard-410c = "qrtr-apps gnss-gpsd qdsp-config"
++EXTRA_DEPS_dart-sd410 = "qrtr-apps gnss-gpsd qdsp-config"
+ 
+ RDEPENDS_${PN} += "${EXTRA_DEPS}"
+ 
+diff --git a/recipes-bsp/firmware/firmware-qcom-dragonboard410c_1032.1.bb b/recipes-bsp/firmware/firmware-qcom-dragonboard410c_1032.1.bb
+index 686f2bc..365a6ec 100644
+--- a/recipes-bsp/firmware/firmware-qcom-dragonboard410c_1032.1.bb
++++ b/recipes-bsp/firmware/firmware-qcom-dragonboard410c_1032.1.bb
+@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "a76405fae85399343bc421b6101ba765d92b3709f2d4ae8afe85dc300c
+ 
+ DEPENDS += "mtools-native"
+ 
+-COMPATIBLE_MACHINE = "(dragonboard-410c)"
++COMPATIBLE_MACHINE = "(dragonboard-410c|dart-sd410)"
+ PACKAGE_ARCH = "${MACHINE_ARCH}"
+ 
+ S = "${WORKDIR}/linux-board-support-package-r${PV}"
+@@ -21,7 +21,7 @@ python do_unpack() {
+     if eula == None:
+         bb.fatal("To use '%s' you need to accept the EULA at '%s'. "
+                  "Please read it and in case you accept it, write: "
+-                 "ACCEPT_EULA_dragonboard-410c = \"1\" in your local.conf." % (pkg, eula_file))
++                 "ACCEPT_EULA_${MACHINE} = \"1\" in your local.conf." % (pkg, eula_file))
+     elif eula == '0':
+         bb.fatal("To use '%s' you need to accept the EULA." % pkg)
+     else:
+diff --git a/recipes-devtools/skales/files/0001-skales-use-support-compressed-ARM64-kernel-image.patch b/recipes-devtools/skales/files/0001-skales-use-support-compressed-ARM64-kernel-image.patch
+new file mode 100644
+index 0000000..17d0920
+--- /dev/null
++++ b/recipes-devtools/skales/files/0001-skales-use-support-compressed-ARM64-kernel-image.patch
+@@ -0,0 +1,104 @@
++From cfc313d3f5568db12214276b82307c06f2ffe4d3 Mon Sep 17 00:00:00 2001
++From: Joonwoo Park <joonwoop@codeaurora.org>
++Date: Wed, 24 Aug 2016 15:40:27 -0700
++Subject: [PATCH 01/10] skales: use/support compressed ARM64 kernel image
++
++Make compressed kernel image as ARM64 default while keeping 8916
++to use uncompressed image as 8916's bootloader doesn't support
++compressed kernel.
++
++Signed-off-by: Joonwoo Park <joonwoop@codeaurora.org>
++---
++ boards/8916 |  1 +
++ boards/8996 | 33 ++++++++++++++++++++++++++++++++-
++ package     | 11 +++++++++--
++ 3 files changed, 42 insertions(+), 3 deletions(-)
++ mode change 120000 => 100644 boards/8996
++
++diff --git a/boards/8916 b/boards/8916
++index c677c96..b0ae3a9 100644
++--- a/boards/8916
+++++ b/boards/8916
++@@ -30,3 +30,4 @@ cmdline="console=ttyMSM0,115200,n8"
++ base=0x00000000
++ dtbs=qcom/
++ arch=arm64
+++image=Image
++diff --git a/boards/8996 b/boards/8996
++deleted file mode 120000
++index e486d4f..0000000
++--- a/boards/8996
+++++ /dev/null
++@@ -1 +0,0 @@
++-8916
++\ No newline at end of file
++diff --git a/boards/8996 b/boards/8996
++new file mode 100644
++index 0000000..b0b3b3f
++--- /dev/null
+++++ b/boards/8996
++@@ -0,0 +1,32 @@
+++#  Copyright (c) 2016, The Linux Foundation. All rights reserved.
+++#
+++#  Redistribution and use in source and binary forms, with or without
+++#  modification, are permitted provided that the following conditions are
+++#  met:
+++#      * Redistributions of source code must retain the above copyright
+++#        notice, this list of conditions and the following disclaimer.
+++#      * Redistributions in binary form must reproduce the above
+++#        copyright notice, this list of conditions and the following
+++#        disclaimer in the documentation and/or other materials provided
+++#        with the distribution.
+++#      * Neither the name of The Linux Foundation nor the names of its
+++#        contributors may be used to endorse or promote products derived
+++#        from this software without specific prior written permission.
+++#
+++#  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+++#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+++#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+++#  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+++#  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+++#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+++#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+++#  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+++#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+++#  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+++#  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+++#
+++
+++cmdline="console=ttyMSM0,115200,n8"
+++base=0x00000000
+++dtbs=qcom/
+++arch=arm64
++diff --git a/package b/package
++index 9e3908b..c8dd762 100755
++--- a/package
+++++ b/package
++@@ -74,7 +74,14 @@ then
++ 	usage
++ fi
++ 
++-image=zImage pagesize=2048 cmdline= base= initrd= needs_fixup= dtb= modules=
+++if test "$arch" = "arm"
+++then
+++	image=zImage
+++else
+++	image=Image.gz
+++fi
+++
+++pagesize=2048 cmdline= base= initrd= needs_fixup= dtb= modules=
++ extra_dir= dtbs= dtarg= arch= uImage= dirty= verbose=
++ target="$1"
++ 
++@@ -211,7 +218,7 @@ then
++ 	dtdir1=arch/arm/boot/dts/
++ 	dtdir2=arch/arm/boot/
++ else
++-	image=arch/arm64/boot/Image
+++	image=arch/arm64/boot/$image
++ 	dtdir1=arch/arm64/boot/dts/
++ 	dtdir2=arch/arm64/boot/dts/
++ fi
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0002-skales-Add-msm8998-support.patch b/recipes-devtools/skales/files/0002-skales-Add-msm8998-support.patch
+new file mode 100644
+index 0000000..fefc967
+--- /dev/null
++++ b/recipes-devtools/skales/files/0002-skales-Add-msm8998-support.patch
+@@ -0,0 +1,67 @@
++From 9e8a4ebdf078b95bd259e17badf79775eed59520 Mon Sep 17 00:00:00 2001
++From: Joonwoo Park <joonwoop@codeaurora.org>
++Date: Wed, 24 Aug 2016 15:59:38 -0700
++Subject: [PATCH 02/10] skales: Add msm8998 support
++
++Add board configuration file and SoC id to dtbTool to support msm8998.
++
++Signed-off-by: Joonwoo Park <joonwoop@codeaurora.org>
++---
++ boards/8998 | 32 ++++++++++++++++++++++++++++++++
++ dtbTool     |  1 +
++ 2 files changed, 33 insertions(+)
++ create mode 100644 boards/8998
++
++diff --git a/boards/8998 b/boards/8998
++new file mode 100644
++index 0000000..5385405
++--- /dev/null
+++++ b/boards/8998
++@@ -0,0 +1,32 @@
+++#  Copyright (c) 2016, The Linux Foundation. All rights reserved.
+++#
+++#  Redistribution and use in source and binary forms, with or without
+++#  modification, are permitted provided that the following conditions are
+++#  met:
+++#      * Redistributions of source code must retain the above copyright
+++#        notice, this list of conditions and the following disclaimer.
+++#      * Redistributions in binary form must reproduce the above
+++#        copyright notice, this list of conditions and the following
+++#        disclaimer in the documentation and/or other materials provided
+++#        with the distribution.
+++#      * Neither the name of The Linux Foundation nor the names of its
+++#        contributors may be used to endorse or promote products derived
+++#        from this software without specific prior written permission.
+++#
+++#  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+++#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+++#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+++#  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+++#  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+++#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+++#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+++#  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+++#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+++#  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+++#  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+++#
+++
+++cmdline=""
+++base=0x00000000
+++dtb=qcom/msm8998-mtp.dtb
+++arch=arm64
++diff --git a/dtbTool b/dtbTool
++index 4be0c35..09fac96 100755
++--- a/dtbTool
+++++ b/dtbTool
++@@ -78,6 +78,7 @@ soc_ids = {
++ 		'msm8216'        : 248,
++ 		'ipq4019'        : 273,
++ 		'apq8096'        : 291,
+++		'msm8998'        : 292,
++ 		'msm8996sg'      : 305,
++ 	}
++ 
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0003-boards-8998-add-clk_ignore_unused-to-kernel-commandl.patch b/recipes-devtools/skales/files/0003-boards-8998-add-clk_ignore_unused-to-kernel-commandl.patch
+new file mode 100644
+index 0000000..64e4539
+--- /dev/null
++++ b/recipes-devtools/skales/files/0003-boards-8998-add-clk_ignore_unused-to-kernel-commandl.patch
+@@ -0,0 +1,29 @@
++From e315fbce16a2dbbcf51c6e030a2594b361ef248b Mon Sep 17 00:00:00 2001
++From: Joonwoo Park <joonwoop@codeaurora.org>
++Date: Fri, 5 Aug 2016 11:38:49 -0700
++Subject: [PATCH 03/10] boards/8998: add clk_ignore_unused to kernel
++ commandline
++
++msm8998 clock driver is unstable at present hence needs this.
++
++Signed-off-by: Joonwoo Park <joonwoop@codeaurora.org>
++---
++ boards/8998 | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/boards/8998 b/boards/8998
++index 5385405..d32ccd9 100644
++--- a/boards/8998
+++++ b/boards/8998
++@@ -26,7 +26,7 @@
++ #  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ #
++ 
++-cmdline=""
+++cmdline="clk_ignore_unused"
++ base=0x00000000
++ dtb=qcom/msm8998-mtp.dtb
++ arch=arm64
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0004-package-Evaluate-arch-later.patch b/recipes-devtools/skales/files/0004-package-Evaluate-arch-later.patch
+new file mode 100644
+index 0000000..1c1bb43
+--- /dev/null
++++ b/recipes-devtools/skales/files/0004-package-Evaluate-arch-later.patch
+@@ -0,0 +1,50 @@
++From d6963899bdbaffb25b3c89dd3ae4a31421a69c85 Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Fri, 4 Nov 2016 11:57:29 -0700
++Subject: [PATCH 04/10] package: Evaluate arch later
++
++If we evaluate arch here it isn't set to anything because it's
++populated from the boards/* files. Let's evaluate after the
++target is parsed so we can get the proper image variable set for
++the arch.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ package | 14 +++++++-------
++ 1 file changed, 7 insertions(+), 7 deletions(-)
++
++diff --git a/package b/package
++index c8dd762..9b03a9e 100755
++--- a/package
+++++ b/package
++@@ -74,13 +74,6 @@ then
++ 	usage
++ fi
++ 
++-if test "$arch" = "arm"
++-then
++-	image=zImage
++-else
++-	image=Image.gz
++-fi
++-
++ pagesize=2048 cmdline= base= initrd= needs_fixup= dtb= modules=
++ extra_dir= dtbs= dtarg= arch= uImage= dirty= verbose=
++ target="$1"
++@@ -99,6 +92,13 @@ case "$target" in
++ 	;;
++ esac
++ 
+++if test "$arch" = "arm"
+++then
+++	image=zImage
+++else
+++	image=Image.gz
+++fi
+++
++ shift
++ 
++ while test $# != 0
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0005-mkbootimg-Always-pad-out-the-image.patch b/recipes-devtools/skales/files/0005-mkbootimg-Always-pad-out-the-image.patch
+new file mode 100644
+index 0000000..948455c
+--- /dev/null
++++ b/recipes-devtools/skales/files/0005-mkbootimg-Always-pad-out-the-image.patch
+@@ -0,0 +1,26 @@
++From 1ccd3e924f6955b1c9d5f921e5311c8db8411787 Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Mon, 19 Dec 2016 15:26:12 -0800
++Subject: [PATCH 05/10] mkbootimg: Always pad out the image
++
++Failure to pad out the image to the end makes it impossible to
++flash the boot.img on devices that expect that padding (e.g. UFS
++type devices). Add it.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ mkbootimg | 1 +
++ 1 file changed, 1 insertion(+)
++
++diff --git a/mkbootimg b/mkbootimg
++index 0f0cf0c..8e50259 100755
++--- a/mkbootimg
+++++ b/mkbootimg
++@@ -136,3 +136,4 @@ if __name__ == "__main__":
++ 	write_padding(output, pagesize)
++ 	if options.devicetree and not append_dtb:
++ 		output.write(devicetree.read())
+++	write_padding(output, pagesize)
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0006-package-Don-t-overwrite-image-from-board-files.patch b/recipes-devtools/skales/files/0006-package-Don-t-overwrite-image-from-board-files.patch
+new file mode 100644
+index 0000000..a5bf39b
+--- /dev/null
++++ b/recipes-devtools/skales/files/0006-package-Don-t-overwrite-image-from-board-files.patch
+@@ -0,0 +1,39 @@
++From 8e805b2566c8399014227d5bf34f2d3b8ffb5321 Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Fri, 27 Jan 2017 11:33:44 -0800
++Subject: [PATCH 06/10] package: Don't overwrite 'image' from board files
++
++If a board file has set 'image' we want to use that. Currently we
++replace it with zImage or Image.gz depending on the architecture.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ package | 11 +++++++----
++ 1 file changed, 7 insertions(+), 4 deletions(-)
++
++diff --git a/package b/package
++index 9b03a9e..77dc71c 100755
++--- a/package
+++++ b/package
++@@ -92,11 +92,14 @@ case "$target" in
++ 	;;
++ esac
++ 
++-if test "$arch" = "arm"
+++if test -z $image
++ then
++-	image=zImage
++-else
++-	image=Image.gz
+++	if test "$arch" = "arm"
+++	then
+++		image=zImage
+++	else
+++		image=Image.gz
+++	fi
++ fi
++ 
++ shift
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0007-boards-8916-Fix-boot-address.patch b/recipes-devtools/skales/files/0007-boards-8916-Fix-boot-address.patch
+new file mode 100644
+index 0000000..68a166c
+--- /dev/null
++++ b/recipes-devtools/skales/files/0007-boards-8916-Fix-boot-address.patch
+@@ -0,0 +1,30 @@
++From 3dca2d054b71a32d85be757aa610b844ed638ac2 Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Fri, 27 Jan 2017 11:34:38 -0800
++Subject: [PATCH 07/10] boards/8916: Fix boot address
++
++8916 memory is at 0x80000000. The bootloader seems to ignore
++whatever we put into the boot.img header, but at least we should
++document this in case that restriction changes in the future.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ boards/8916 | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/boards/8916 b/boards/8916
++index b0ae3a9..1d539a9 100644
++--- a/boards/8916
+++++ b/boards/8916
++@@ -27,7 +27,7 @@
++ #
++ 
++ cmdline="console=ttyMSM0,115200,n8"
++-base=0x00000000
+++base=0x80000000
++ dtbs=qcom/
++ arch=arm64
++ image=Image
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0008-mkbootimg-Add-boards-option.patch b/recipes-devtools/skales/files/0008-mkbootimg-Add-boards-option.patch
+new file mode 100644
+index 0000000..6e40e2a
+--- /dev/null
++++ b/recipes-devtools/skales/files/0008-mkbootimg-Add-boards-option.patch
+@@ -0,0 +1,47 @@
++From 71b671bc88f16d878064c65d6e7b46726545b20c Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Wed, 1 Feb 2017 14:05:55 -0800
++Subject: [PATCH 08/10] mkbootimg: Add --boards option
++
++This option exists in the upstream version of mkbootimg. Add it
++here to support users expecting similar behavior.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ mkbootimg | 6 +++++-
++ 1 file changed, 5 insertions(+), 1 deletion(-)
++
++diff --git a/mkbootimg b/mkbootimg
++index 8e50259..c0e7dcb 100755
++--- a/mkbootimg
+++++ b/mkbootimg
++@@ -57,6 +57,8 @@ if __name__ == "__main__":
++ 	parser.add_option("--pagesize", type="int", dest="pagesize",
++ 			  default=2048,
++ 			  help="NAND pagesize [default: %default]")
+++	parser.add_option("--board", dest="board", default="",
+++			  help="Board identifier")
++ 	# New options
++ 	parser.add_option("--ramdisk_base", type="int", dest="ramdisk_base",
++ 			  default=-1, help="Start address of ramdisk image")
++@@ -75,6 +77,8 @@ if __name__ == "__main__":
++ 		parser.error("Must specify --base")
++ 	if options.cmdline is None:
++ 		parser.error("Must specify --cmdline")
+++	if len(options.board) > 16:
+++		parser.error("--boards argument must be <= 16 characters")
++ 
++ 	try:
++ 		kernel = open(options.kernel, 'rb')
++@@ -123,7 +127,7 @@ if __name__ == "__main__":
++ 			  tags,
++ 			  options.pagesize,
++ 			  dtb_size, 0,
++-			  b"",
+++			  options.board.encode(),
++ 			  options.cmdline.encode(),
++ 			  123456, 123456, 123456, 123456, 123456, 123456,
++ 			  0, 0))
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0009-README-only-libfdt1-is-required.patch b/recipes-devtools/skales/files/0009-README-only-libfdt1-is-required.patch
+new file mode 100644
+index 0000000..a2ef0ba
+--- /dev/null
++++ b/recipes-devtools/skales/files/0009-README-only-libfdt1-is-required.patch
+@@ -0,0 +1,29 @@
++From 8492547e404e969262d9070dee9bdd15668bb70f Mon Sep 17 00:00:00 2001
++From: Stephen Boyd <sboyd@codeaurora.org>
++Date: Wed, 1 Feb 2017 14:07:03 -0800
++Subject: [PATCH 09/10] README: only libfdt1 is required
++
++We don't require the library development package, just the
++library.
++
++Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
++---
++ README | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/README b/README
++index f39fe71..9e4af60 100644
++--- a/README
+++++ b/README
++@@ -14,7 +14,7 @@ Prerequisites
++ 
++ To use dtbTool you should have libfdt installed.
++ 
++- libfdt-dev (debian)
+++ libfdt1 (debian)
++  libfdt-devel (redhat)
++  sys-apps/dtc (gentoo)
++  community/dtc (arch)
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/files/0010-Variscite-DART-SD410-platform-support-added.patch b/recipes-devtools/skales/files/0010-Variscite-DART-SD410-platform-support-added.patch
+new file mode 100644
+index 0000000..13b9dcc
+--- /dev/null
++++ b/recipes-devtools/skales/files/0010-Variscite-DART-SD410-platform-support-added.patch
+@@ -0,0 +1,24 @@
++From 87b2486f14f90eb8ca42218a85ead1e2ede2443a Mon Sep 17 00:00:00 2001
++From: Leonid Segal <leonid.s@variscite.com>
++Date: Tue, 20 Jun 2017 15:40:15 +0300
++Subject: [PATCH 10/10] Variscite DART-SD410 platform support added
++
++---
++ dtbTool | 1 +
++ 1 file changed, 1 insertion(+)
++
++diff --git a/dtbTool b/dtbTool
++index 64b8356..216c118 100755
++--- a/dtbTool
+++++ b/dtbTool
++@@ -108,6 +108,7 @@ platform_type = {
++ 		'stp'         : 23,
++ 		'sbc'         : 24,
++ 		'cls'         : 29,
+++		'dart'        : 30,
++ 		}
++ 
++ pmic_ids = {
++-- 
++2.13.0
++
+diff --git a/recipes-devtools/skales/skales_git.bb b/recipes-devtools/skales/skales_git.bb
+index 71928e8..453ad95 100644
+--- a/recipes-devtools/skales/skales_git.bb
++++ b/recipes-devtools/skales/skales_git.bb
+@@ -12,6 +12,19 @@ SRCREV = "6eac9e943de53c4aaaede3697e9226a47686fe25"
+ PV = "1.5.0+git${SRCPV}"
+ 
+ SRC_URI = "git://codeaurora.org/quic/kernel/skales"
++SRC_URI += " \
++	file://0001-skales-use-support-compressed-ARM64-kernel-image.patch \
++	file://0002-skales-Add-msm8998-support.patch \
++	file://0003-boards-8998-add-clk_ignore_unused-to-kernel-commandl.patch \
++	file://0004-package-Evaluate-arch-later.patch \
++	file://0005-mkbootimg-Always-pad-out-the-image.patch \
++	file://0006-package-Don-t-overwrite-image-from-board-files.patch \
++	file://0007-boards-8916-Fix-boot-address.patch \
++	file://0008-mkbootimg-Add-boards-option.patch \
++	file://0009-README-only-libfdt1-is-required.patch \
++	file://0010-Variscite-DART-SD410-platform-support-added.patch \
++	"
++
+ 
+ S = "${WORKDIR}/git"
+ 
+diff --git a/recipes-kernel/linux/files/HDMI_enable.patch b/recipes-kernel/linux/files/HDMI_enable.patch
+new file mode 100644
+index 0000000..a74f1d7
+--- /dev/null
++++ b/recipes-kernel/linux/files/HDMI_enable.patch
+@@ -0,0 +1,13 @@
++diff --git a/arch/arm64/boot/dts/qcom/apq8016-var-dart.dts b/arch/arm64/boot/dts/qcom/apq8016-var-dart.dts
++index f3ac16757ec1..ea46afa94b85 100644
++--- a/arch/arm64/boot/dts/qcom/apq8016-var-dart.dts
+++++ b/arch/arm64/boot/dts/qcom/apq8016-var-dart.dts
++@@ -14,7 +14,7 @@
++ /dts-v1/;
++ 
++ #include "apq8016-var-dart.dtsi"
++-
+++#define HDMI_DISPLAY
++ #ifdef HDMI_DISPLAY
++ 	#include "apq8016-var-dart-hdmi.dtsi"
++ #else
+diff --git a/recipes-kernel/linux/linux-linaro-qcom.inc b/recipes-kernel/linux/linux-linaro-qcom.inc
+index 2b3a3ea..2486135 100644
+--- a/recipes-kernel/linux/linux-linaro-qcom.inc
++++ b/recipes-kernel/linux/linux-linaro-qcom.inc
+@@ -20,6 +20,7 @@ S = "${WORKDIR}/git"
+ KERNEL_DEFCONFIG_aarch64 ?= "${S}/arch/arm64/configs/defconfig"
+ KERNEL_DEFCONFIG_apq8064 ?= "${S}/arch/arm/configs/qcom_defconfig"
+ KERNEL_CONFIG_FRAGMENTS += "${S}/kernel/configs/distro.config"
++KERNEL_CONFIG_FRAGMENTS_dart-sd410 += "${S}/kernel/configs/var-sd410.config"
+ 
+ kernel_conf_variable() {
+ 	CONF_SED_SCRIPT="$CONF_SED_SCRIPT /CONFIG_$1[ =]/d;"
+diff --git a/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb b/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
+index 3fbacdc..b7e6ce1 100644
+--- a/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
++++ b/recipes-kernel/linux/linux-linaro-qcomlt_4.9.bb
+@@ -13,7 +13,10 @@ LOCALVERSION ?= "-linaro-lt-qcom"
+ SRCBRANCH ?= "release/qcomlt-4.9"
+ SRCREV ?= "529c1db225629896d51b64a481b3760fd81a663a"
+ 
+-COMPATIBLE_MACHINE = "(ifc6410|sd-600eval|dragonboard-410c)"
++SRC_URI_dart-sd410 = "git://github.com/varigit/DART-SD410-kernel.git;protocol=https;branch=release/kernel-17.06"
++SRCREV_dart-sd410 = "d71b224577d0d0c20a937c18f781446b21f21d7e"
++
++COMPATIBLE_MACHINE = "(ifc6410|sd-600eval|dragonboard-410c|dart-sd410)"
+ 
+ # Wifi firmware has a recognizable arch :( 
+ ERROR_QA_remove = "arch"
+-- 
+2.13.0
+
