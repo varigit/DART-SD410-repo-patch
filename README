@@ -1,4 +1,41 @@
 Yocto repositories patch
 
+This three contains specific patches for the Yocto tree that will enable Variscite's platform DART-SD410.
+Usage:
+Install repo:
+$ mkdir ~/bin
+$ PATH=~/bin:$PATH
+$ curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+$ chmod a+x ~/bin/repo
 
-This tree contains specific patches for the Yocto tree that will enable Variscite's platform DART-SD410.
+Download sources:
+$ mkdir -p ~/sd410-yocto/pyro
+$ cd  ~/sd410-yocto/pyro
+$ repo init -u https://github.com/96boards/oe-rpb-manifest.git -b pyro
+$ repo sync -j10
+
+Download the meta-qcom patch:
+$ git clone https://github.com/varigit/DART-SD410-repo-patch.git
+$ cd DART-SD410-repo-patch
+$ git checkout -b yocto/pyro remotes/origin/yocto/pyro
+
+Apply the patch to meta-qcom layer.
+$ cd ../layers/meta-qcom
+$ git am ../../DART-SD410-repo-patch/meta-qcom/0001-dart-sd410-Variscite-DART-SD410-platform-support-add.patch
+
+If you want to use HDMI screen apply the HDMI patch:
+$ git apply ../../DART-SD410-repo-patch/meta-qcom/HDMI_Enable_patch.diff
+
+Setup environment:
+$ source setup-environment
+choose dart-sd410 platform
+select distribution
+
+Build the image:
+$ bitbake rpb-console-image rpb-desktop-image
+	
+To burn the images, burn the RescueImages first and 
+then change to the new built one the rootfs and boot image.
+
+After the first boot the SOM will recognize wrong partition size.
+The rootfs partition will be very small.
